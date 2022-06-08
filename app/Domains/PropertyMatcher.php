@@ -14,34 +14,38 @@ class PropertyMatcher implements PropertyMatcherInterface
             $looseMatches = 0;
             $strictMatches = 0;
             foreach($propertyFields as $propertyField){
-                $propertyFieldValue = $propertyField->value;
-                $searchProfileId = $searchProfileField['fieldable_id'];
-
-                if(is_array($searchProfileField['value'])){
-                    $searchProfileMinPrice = $searchProfileField['value'][0];
-                    $searchProfileMaxPrice = $searchProfileField['value'][1];
-
-                    if(($searchProfileMinPrice <= $propertyFieldValue) && ($propertyFieldValue <= $searchProfileMaxPrice)){
-                        $strictMatches++;
-                    }else{
-                        $looseSearchProfilePrice = $this->calculateDeviationPercentage($searchProfileMinPrice, $searchProfileMaxPrice);
-
-                        $looseSearchProfileMinPrice = $looseSearchProfilePrice['newLooseSearchProfileMinPrice'];
-                        $looseSearchProfileMaxPrice = $looseSearchProfilePrice['newLooseSearchProfileMaxPrice'];
-        
-                        if(($looseSearchProfileMinPrice <= $propertyFieldValue) && ($propertyFieldValue <= $looseSearchProfileMaxPrice)){
-                            $looseMatches++;
+                if($propertyField['name'] == $searchProfileField['name']){
+                    $propertyFieldValue = $propertyField->value;
+                    $searchProfileId = $searchProfileField['fieldable_id'];
+    
+                    if(is_array($searchProfileField['value'])){
+                        $searchProfileMinPrice = $searchProfileField['value'][0];
+                        $searchProfileMaxPrice = $searchProfileField['value'][1];
+    
+                        if(($searchProfileMinPrice <= $propertyFieldValue) && ($propertyFieldValue <= $searchProfileMaxPrice)){
+                            $strictMatches++;
+                        }else{
+                            $looseSearchProfilePrice = $this->calculateDeviationPercentage($searchProfileMinPrice, $searchProfileMaxPrice);
+    
+                            $looseSearchProfileMinPrice = $looseSearchProfilePrice['newLooseSearchProfileMinPrice'];
+                            $looseSearchProfileMaxPrice = $looseSearchProfilePrice['newLooseSearchProfileMaxPrice'];
+            
+                            if(($looseSearchProfileMinPrice <= $propertyFieldValue) && ($propertyFieldValue <= $looseSearchProfileMaxPrice)){
+                                $looseMatches++;
+                            }
                         }
-                    }
-                }else{
-                    if($propertyFieldValue == $searchProfileField['value']){
-                        $strictMatches++;
+                    }else{
+                        if($propertyFieldValue == $searchProfileField['value']){
+                            $strictMatches++;
+                        }
                     }
                 }
             }
-            $matchedPropertySearchProfiles[] = [
-                'searchProfileId' => $searchProfileId, 'strictMatchesCount' => $strictMatches, 'looseMatchesCount' => $looseMatches
-            ];
+            if(isset($searchProfileId)){
+                $matchedPropertySearchProfiles[] = [
+                    'searchProfileId' => $searchProfileId, 'strictMatchesCount' => $strictMatches, 'looseMatchesCount' => $looseMatches
+                ];
+            }
         }
         return $this->totalPropertyMatchedSearchProfiles($matchedPropertySearchProfiles);
     }

@@ -16,6 +16,6 @@ class MatchController extends Controller
 
     public function getPropertyMatches($propertyId)
     {
-        return $searchProfiles = $this->matchService->getPropertyMatches($propertyId);
+        return $this->matchService->getPropertyMatches($propertyId);
     }
 }
